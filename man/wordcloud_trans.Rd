@@ -27,10 +27,8 @@ Plot of word cloud
 Create Quran translation's word cloud
 }
 \examples{
-
-\dontrun{
-trans_en_sahih <- tanzil_translation("https://tanzil.net/trans/en.sahih")
-wordcloud_trans(trans_en_sahih, c(1,2,3))
-}
+# Example using package default data (if data is built)
+# data(trans_en_sahih, package = "XploreQuran")
+# wordcloud_trans(trans_en_sahih, surah_number = 114, max_word = 10)
 
 }

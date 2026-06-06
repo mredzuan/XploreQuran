@@ -15,11 +15,9 @@
 #' @export
 #'
 #' @examples
-#' 
-#' \dontrun{
-#' trans_en_sahih <- tanzil_translation("https://tanzil.net/trans/en.sahih")
-#' wordcloud_trans(trans_en_sahih, c(1,2,3))
-#' }
+#' # Example using package default data (if data is built)
+#' # data(trans_en_sahih, package = "XploreQuran")
+#' # wordcloud_trans(trans_en_sahih, surah_number = 114, max_word = 10)
 #' 
 wordcloud_trans <- function(tanzil_trans_object, surah_number = (1:114), max_word = 200, min_freq = 1){
   
@@ -34,7 +32,7 @@ wordcloud_trans <- function(tanzil_trans_object, surah_number = (1:114), max_wor
   }
   
   token_trans <- tanzil_trans_object[[1]] %>% 
-    filter(surah_no %in% surah_number) %>% 
+    filter(surah_id %in% surah_number) %>% 
     unnest_tokens(word, translation) %>% 
     count(word)
   

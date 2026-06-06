@@ -1,0 +1,6 @@
+{
+    "positron.assistant.inlineCompletions.enable": {
+        "r": true,
+        "python": true
+    }
+}

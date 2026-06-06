@@ -13,16 +13,9 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' trans_en_sahih <- tanzil_translation("https://tanzil.net/trans/en.sahih")
-#' trans_en_yusof <- tanzil_translation("https://tanzil.net/trans/en.yusufali")
-#' 
-#' 
-#' tf_trans_shahih <- tf_trans(trans_en_sahih)
-#' tf_trans_surah_short_shahih <- tf_trans(trans_en_sahih, c(113, 112, 109, 111, 114, 110))
-#' tf_trans_surah_short_yusoff <- tf_trans(trans_en_yusof, c(113, 112, 109, 111, 114, 110))
-#' 
-#' }
+#' # Example using package default data (if data is built)
+#' # data(trans_en_sahih, package = "XploreQuran")
+#' # tf_trans(trans_en_sahih, surah_number = 1)
 #' 
 #' 
 tf_trans <- function(tanzil_trans_object, surah_number = (1:114)){
@@ -40,14 +33,14 @@ tf_trans <- function(tanzil_trans_object, surah_number = (1:114)){
   }
   
   count_word_trans <- tanzil_trans_object[[1]] %>% 
-    filter(surah_no %in% surah_number) %>% 
+    filter(surah_id %in% surah_number) %>% 
     unnest_tokens(word, translation) %>% 
-    count(surah_no, surah_title_en, word, sort = TRUE)
+    count(surah_id, surah_title_en, word, sort = TRUE)
   
   total_word_trans <- count_word_trans %>% 
-    group_by(surah_no) %>% 
+    group_by(surah_id) %>% 
     summarize(total = sum(n))
   
-  join_count_total_word_trans <- left_join(count_word_trans, total_word_trans, by = "surah_no") %>% 
+  join_count_total_word_trans <- left_join(count_word_trans, total_word_trans, by = "surah_id") %>% 
     mutate(tf = n/total)
 }

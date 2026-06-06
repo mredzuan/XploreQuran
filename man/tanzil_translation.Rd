@@ -17,8 +17,9 @@ Pull Quran Translation From tanzil.net
 }
 \examples{
 \dontrun{
-trans_malay_basmeih_list <- tanzil_translation("https://tanzil.net/trans/ms.basmeih")
-trans_en_sahih_list <- tanzil_translation("https://tanzil.net/trans/en.sahih")
+# Requires internet connection to download from tanzil.net
+trans_ms_basmeih <- tanzil_translation("https://tanzil.net/trans/ms.basmeih")
+head(trans_ms_basmeih$translation_text)
 }
 
 }
