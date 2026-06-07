@@ -1,0 +1,230 @@
+/* ===========================================================================
+   www/custom.css
+   XploreQuran - Custom Stylesheet
+   Layered on top of bslib dark theme for premium aesthetics.
+   =========================================================================== */
+
+/* --- Google Font Import ---------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* --- Base Overrides -------------------------------------------------------- */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0d1117;
+  color: #e6edf3;
+}
+
+/* --- Navbar ---------------------------------------------------------------- */
+.navbar {
+  background: linear-gradient(90deg, #161b22 0%, #1c2128 100%) !important;
+  border-bottom: 1px solid #30363d;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  padding: 0.6rem 1.5rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  color: #58a6ff !important;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: #8b949e !important;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #e6edf3 !important;
+}
+
+.nav-link.active {
+  border-bottom: 2px solid #58a6ff;
+}
+
+/* --- Sidebar --------------------------------------------------------------- */
+.bslib-sidebar-layout > .sidebar {
+  background-color: #161b22 !important;
+  border-right: 1px solid #30363d;
+}
+
+.sidebar label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- Cards ----------------------------------------------------------------- */
+.card {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px rgba(88, 166, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.card-header {
+  background-color: #1c2128;
+  border-bottom: 1px solid #30363d;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.01em;
+  color: #c9d1d9;
+}
+
+/* --- Value Boxes ----------------------------------------------------------- */
+.value-box {
+  border: 1px solid #30363d !important;
+  border-radius: 0.75rem !important;
+  background: linear-gradient(135deg, #161b22 0%, #1c2128 100%) !important;
+}
+
+.value-box .value-box-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #58a6ff;
+}
+
+.value-box .value-box-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8b949e;
+}
+
+/* --- Buttons --------------------------------------------------------------- */
+.btn-primary {
+  background: linear-gradient(135deg, #1f6feb 0%, #58a6ff 100%);
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #30363d;
+  color: #e6edf3;
+}
+
+/* --- Select / Input Controls ----------------------------------------------- */
+.form-select,
+.form-control {
+  background-color: #21262d !important;
+  border-color: #30363d !important;
+  color: #e6edf3 !important;
+  font-size: 0.875rem;
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: #58a6ff !important;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2) !important;
+}
+
+/* --- Plotly Charts --------------------------------------------------------- */
+.js-plotly-plot .plotly {
+  border-radius: 0.5rem;
+}
+
+/* --- Loading Spinner ------------------------------------------------------- */
+.shiny-busy-indicator-bar {
+  background: linear-gradient(90deg, #1f6feb, #58a6ff) !important;
+  height: 3px !important;
+}
+
+/* --- Quran Ayah Display ---------------------------------------------------- */
+.ayah-card {
+  background-color: #1c2128;
+  border: 1px solid #30363d;
+  border-radius: 0.6rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.ayah-card:hover {
+  border-color: #58a6ff;
+}
+
+.ayah-arabic {
+  font-family: 'Amiri', serif;
+  font-size: 1.4rem;
+  text-align: right;
+  direction: rtl;
+  color: #f0a500;
+  line-height: 2.2;
+}
+
+.ayah-translation {
+  font-size: 0.9rem;
+  color: #c9d1d9;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+.ayah-ref {
+  font-size: 0.75rem;
+  color: #58a6ff;
+  font-weight: 600;
+}
+
+/* --- Overview Stats Banner ------------------------------------------------- */
+.stats-banner {
+  background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
+  border: 1px solid #30363d;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Tab Panels ------------------------------------------------------------ */
+.nav-tabs {
+  border-bottom: 1px solid #30363d;
+}
+
+.nav-tabs .nav-link {
+  color: #8b949e !important;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+  color: #e6edf3 !important;
+  border-bottom-color: #58a6ff;
+  background: transparent;
+}
+
+/* --- Scrollbar ------------------------------------------------------------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #58a6ff; }
+
+/* --- Responsive Utilities -------------------------------------------------- */
+@media (max-width: 768px) {
+  .navbar-brand { font-size: 1rem; }
+  .value-box .value-box-value { font-size: 1.5rem; }
+}
