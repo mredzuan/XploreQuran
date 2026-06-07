@@ -7,6 +7,7 @@
 #' @importFrom readr read_delim
 #' @importFrom stringr str_split_fixed str_detect str_remove str_trim
 #' @importFrom tidyr separate
+#' @importFrom utils data
 #' @import dplyr
 #' @import quRan
 #' 
@@ -41,7 +42,10 @@ trans_text <- trans[[1]][1:6236] %>%
   mutate(ayah_id = as.integer(ayah_id)) %>% 
   left_join(quran_meta, by = c("surah_id" = "surah_id", "ayah_id" = "ayah")) %>% 
   # Rename "ayah_id" column to "surah_ayah_id" and "ayah_id.y" to "ayah_id"
-  rename("surah_ayah_id" = "ayah_id", "ayah_id" = "ayah_id.y") %>% 
+  rename("surah_ayah_id" = "ayah_id", "ayah_id" = "ayah_id.y") %>%
+  # Ensure all character-like columns are stored as character, not factor
+  # (quRan package datasets may carry factor columns from older R behaviour)
+  mutate(across(where(is.factor), as.character)) %>%
   select(ayah_id, surah_id, surah_ayah_id, everything())
 
 
