@@ -2,6 +2,7 @@
 % Please edit documentation in R/trans_analytic_config.R
 \name{trans_analytic_config}
 \alias{trans_analytic_config}
+\alias{TransAnalyticConfig}
 \title{Create a Translation Analytic Configuration Object}
 \usage{
 trans_analytic_config(
