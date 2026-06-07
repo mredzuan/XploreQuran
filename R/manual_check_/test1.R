@@ -59,7 +59,33 @@ attr(trans_list, "trans_indicator") <- trans_info %>%
   paste(collapse = "-")
 
 
+
+
+# Check hierachy of Juz and surah in the translation text data
+
+# group by the table trans_ms_basmeih[["translation_text"]] by Juz and summarize number of surah belong to each Juz
+group_by_juz <- trans_ms_basmeih[["translation_text"]] %>% 
+  group_by(juz) %>% 
+  #Create column name that indicate which surah fall under each Juz
+  mutate(surah_list = paste(surah_id, collapse = ", ")) %>% 
+  summarize(num_surah = n_distinct(surah_id)) %>% 
+  arrange(juz) %>% 
+  #calculate total num_surah
+  mutate(total_surah = sum(num_surah)) 
+
+
+
 #test-------
+
+# Pull translation test
 
 trans_ms_basmeih <- tanzil_translation("https://tanzil.net/trans/ms.basmeih")
 head(trans_ms_basmeih$translation_text)
+
+
+# Term frequency test
+
+tf_ms_basmeih <- tf_trans(trans_ms_basmeih, surah_number = (114))
+
+
+
