@@ -202,9 +202,14 @@ test_that("wordcloud_trans() errors on invalid input object", {
 # tanzil_translation() integration test (requires internet)
 # =========================================================================
 test_that("tanzil_translation downloads and parses correctly", {
-  if (class(try(curl::nslookup("tanzil.net"), silent = TRUE)) == "try-error") {
-    skip("Offline - skipping Tanzil download test")
-  }
+  # Check internet connectivity using base R (no curl dependency needed)
+  online <- tryCatch({
+    readLines("https://tanzil.net", n = 1L, warn = FALSE)
+    TRUE
+  }, error = function(e) FALSE)
+  
+  if (!online) skip("Offline - skipping Tanzil download test")
+  
   res <- tanzil_translation("https://tanzil.net/trans/en.qarai")
   expect_s3_class(res, "translationList")
   expect_equal(nrow(res$translation_text), 6236)
