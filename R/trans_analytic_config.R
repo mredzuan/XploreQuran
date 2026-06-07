@@ -35,6 +35,7 @@
 #'   Default \code{NULL}.
 #'
 #' @return An S3 object of class \code{TransAnalyticConfig}.
+#' @aliases TransAnalyticConfig
 #'
 #' @export
 #'
