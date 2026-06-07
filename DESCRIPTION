@@ -12,18 +12,21 @@ Imports:
     dplyr,
     RColorBrewer,
     readr,
+    rlang,
     stringr,
     tidyr,
     tidytext,
     wordcloud,
     shiny,
+    bslib,
+    bsicons,
+    plotly,
+    purrr,
     quRan,
     stopwords,
     SnowballC,
     utils
 Suggests:
-    bslib,
-    plotly,
     testthat (>= 3.0.0),
     curl
 Depends: 
