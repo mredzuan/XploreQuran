@@ -25,7 +25,7 @@ trans <- read_delim(urlLink, delim = "\n", col_names = FALSE, show_col_types = F
 trans2 <- read_delim(urlLink2, delim = "\n", col_names = FALSE, show_col_types = FALSE)
 trans3_jpn <- read_delim(urlink3_japan, delim = "\n", col_names = FALSE, show_col_types = FALSE)
   
-  # The Tanzil text has exactly 6236 ayahs
+# The Tanzil text has exactly 6236 ayahs
 trans_text <- trans[[1]][1:6236] %>% 
   str_split_fixed("\\|", 3) %>% 
   as.data.frame() %>% 
@@ -57,3 +57,9 @@ attr(trans_list, "trans_indicator") <- trans_info %>%
   filter(info == "Translator") %>% 
   pull(value) %>% 
   paste(collapse = "-")
+
+
+#test-------
+
+trans_ms_basmeih <- tanzil_translation("https://tanzil.net/trans/ms.basmeih")
+head(trans_ms_basmeih$translation_text)
