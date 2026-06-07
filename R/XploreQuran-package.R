@@ -6,7 +6,7 @@
 #'
 #' The package supports multiple languages and translators, with a modular
 #' design allowing consistent analysis across different functions via the
-#' \code{\link{QuranConfig}} S3 object.
+#' \code{\link{TransAnalyticConfig}} S3 object.
 #'
 #' @section Main Functions:
 #' \describe{
