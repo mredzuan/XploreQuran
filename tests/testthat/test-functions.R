@@ -36,12 +36,13 @@ create_mock_translation <- function() {
 }
 
 # =========================================================================
-# quran_config() tests
+# trans_analytic_config() tests
 # =========================================================================
-test_that("quran_config() creates a valid QuranConfig object", {
-  cfg <- quran_config()
-  expect_s3_class(cfg, "QuranConfig")
+test_that("trans_analytic_config() creates a valid TransAnalyticConfig object", {
+  cfg <- trans_analytic_config()
+  expect_s3_class(cfg, "TransAnalyticConfig")
   expect_equal(cfg$by, "surah")
+  expect_null(cfg$sub_by)
   expect_equal(cfg$ngram, "unigram")
   expect_equal(cfg$top_n, 20L)
   expect_true(cfg$remove_stopwords)
@@ -51,13 +52,47 @@ test_that("quran_config() creates a valid QuranConfig object", {
   expect_null(cfg$remove_words)
 })
 
-test_that("quran_config() accepts custom values", {
-  cfg <- quran_config(
-    by = "juz", ngram = "bigram", top_n = 10,
-    stopword_lang = "ms", normalize = FALSE,
-    remove_words = c("allah")
+test_that("trans_analytic_config() accepts valid sub_by for surah", {
+  cfg <- trans_analytic_config(by = "surah", sub_by = c(1, 57, 114))
+  expect_equal(cfg$sub_by, c(1L, 57L, 114L))
+})
+
+test_that("trans_analytic_config() accepts valid sub_by for juz", {
+  cfg <- trans_analytic_config(by = "juz", sub_by = c(1, 15, 30))
+  expect_equal(cfg$sub_by, c(1L, 15L, 30L))
+})
+
+test_that("trans_analytic_config() accepts valid sub_by for ayah", {
+  cfg <- trans_analytic_config(by = "ayah", sub_by = c(1, 6236))
+  expect_equal(cfg$sub_by, c(1L, 6236L))
+})
+
+test_that("trans_analytic_config() rejects out-of-range sub_by for surah", {
+  expect_error(trans_analytic_config(by = "surah", sub_by = 115))
+  expect_error(trans_analytic_config(by = "surah", sub_by = 0))
+})
+
+test_that("trans_analytic_config() rejects out-of-range sub_by for juz", {
+  expect_error(trans_analytic_config(by = "juz", sub_by = 31))
+  expect_error(trans_analytic_config(by = "juz", sub_by = c(1, 31)))
+})
+
+test_that("trans_analytic_config() rejects out-of-range sub_by for ayah", {
+  expect_error(trans_analytic_config(by = "ayah", sub_by = 6237))
+})
+
+test_that("trans_analytic_config() accepts sub_by = NULL (all data)", {
+  cfg <- trans_analytic_config(sub_by = NULL)
+  expect_null(cfg$sub_by)
+})
+
+test_that("trans_analytic_config() accepts custom values", {
+  cfg <- trans_analytic_config(
+    by = "juz", sub_by = 30, ngram = "bigram", top_n = 10,
+    stopword_lang = "ms", normalize = FALSE, remove_words = c("allah")
   )
   expect_equal(cfg$by, "juz")
+  expect_equal(cfg$sub_by, 30L)
   expect_equal(cfg$ngram, "bigram")
   expect_equal(cfg$top_n, 10L)
   expect_equal(cfg$stopword_lang, "ms")
@@ -65,34 +100,43 @@ test_that("quran_config() accepts custom values", {
   expect_equal(cfg$remove_words, "allah")
 })
 
-test_that("quran_config() rejects invalid by argument", {
-  expect_error(quran_config(by = "chapter"))
+test_that("trans_analytic_config() rejects invalid by argument", {
+  expect_error(trans_analytic_config(by = "chapter"))
 })
 
-test_that("quran_config() rejects invalid ngram argument", {
-  expect_error(quran_config(ngram = "fourgram"))
+test_that("trans_analytic_config() rejects invalid ngram argument", {
+  expect_error(trans_analytic_config(ngram = "fourgram"))
 })
 
-test_that("quran_config() rejects invalid top_n", {
-  expect_error(quran_config(top_n = -5))
+test_that("trans_analytic_config() rejects invalid top_n", {
+  expect_error(trans_analytic_config(top_n = -5))
 })
 
-test_that("quran_config() warns for unsupported stopword language", {
-  expect_warning(quran_config(stopword_lang = "zz"))
+test_that("trans_analytic_config() warns for unsupported stopword language", {
+  expect_warning(trans_analytic_config(stopword_lang = "zz"))
 })
 
-test_that("quran_config() accepts 'english' as snowball language name", {
-  # 'english' is valid via snowball source — should produce no warning
-  expect_no_warning(quran_config(stopword_lang = "english"))
+test_that("trans_analytic_config() accepts 'english' as full language name", {
+  expect_no_warning(trans_analytic_config(stopword_lang = "english"))
 })
 
-test_that("quran_config() messages user when normalize is skipped for Malay", {
-  expect_message(quran_config(normalize = TRUE, stopword_lang = "ms"))
+test_that("trans_analytic_config() messages user when normalize is skipped for Malay", {
+  expect_message(trans_analytic_config(normalize = TRUE, stopword_lang = "ms"))
 })
 
-test_that("print.QuranConfig() runs without error", {
-  cfg <- quran_config()
-  expect_output(print(cfg), "XploreQuran Analysis Configuration")
+test_that("print.TransAnalyticConfig() runs without error", {
+  cfg <- trans_analytic_config()
+  expect_output(print(cfg), "XploreQuran Translation Analytic Config")
+})
+
+test_that("print.TransAnalyticConfig() shows sub_by selection in output", {
+  cfg <- trans_analytic_config(by = "juz", sub_by = c(29, 30))
+  expect_output(print(cfg), "29, 30")
+})
+
+test_that("print.TransAnalyticConfig() shows '(all)' when sub_by is NULL", {
+  cfg <- trans_analytic_config()
+  expect_output(print(cfg), "\\(all\\)")
 })
 
 # =========================================================================
@@ -100,7 +144,7 @@ test_that("print.QuranConfig() runs without error", {
 # =========================================================================
 test_that("tf_trans() returns a data frame with expected columns", {
   mock <- create_mock_translation()
-  cfg <- quran_config(remove_stopwords = FALSE, normalize = FALSE)
+  cfg  <- trans_analytic_config(remove_stopwords = FALSE, normalize = FALSE)
   result <- tf_trans(mock, config = cfg)
   expect_s3_class(result, "data.frame")
   expect_true(all(c("word", "n", "total", "tf", "tf_idf") %in% names(result)))
@@ -108,22 +152,24 @@ test_that("tf_trans() returns a data frame with expected columns", {
 
 test_that("tf_trans() respects top_n limit", {
   mock <- create_mock_translation()
-  cfg <- quran_config(top_n = 3, remove_stopwords = FALSE, normalize = FALSE)
+  cfg  <- trans_analytic_config(top_n = 3, remove_stopwords = FALSE, normalize = FALSE)
   result <- tf_trans(mock, config = cfg)
   expect_true(all(table(result$surah_id) <= 3))
 })
 
-test_that("tf_trans() filters by surah selection", {
+test_that("tf_trans() filters by surah using sub_by in config", {
   mock <- create_mock_translation()
-  cfg <- quran_config(remove_stopwords = FALSE, normalize = FALSE)
-  result <- tf_trans(mock, config = cfg, selection = 1)
+  cfg  <- trans_analytic_config(by = "surah", sub_by = 1,
+                                remove_stopwords = FALSE, normalize = FALSE)
+  result <- tf_trans(mock, config = cfg)
   expect_true(all(result$surah_id == 1))
 })
 
-test_that("tf_trans() filters by juz selection", {
+test_that("tf_trans() filters by juz using sub_by in config", {
   mock <- create_mock_translation()
-  cfg <- quran_config(by = "juz", remove_stopwords = FALSE, normalize = FALSE)
-  result <- tf_trans(mock, config = cfg, selection = 30)
+  cfg  <- trans_analytic_config(by = "juz", sub_by = 30,
+                                remove_stopwords = FALSE, normalize = FALSE)
+  result <- tf_trans(mock, config = cfg)
   expect_true(all(result$juz == 30))
 })
 
@@ -137,10 +183,11 @@ test_that("tf_trans() errors on invalid input object", {
 # =========================================================================
 test_that("wordcloud_trans() returns invisible word freq data frame", {
   mock <- create_mock_translation()
-  cfg <- quran_config(remove_stopwords = FALSE, normalize = FALSE)
+  cfg  <- trans_analytic_config(by = "surah", sub_by = 114,
+                                remove_stopwords = FALSE, normalize = FALSE)
   pdf(NULL)
   on.exit(dev.off())
-  result <- wordcloud_trans(mock, config = cfg, selection = 114)
+  result <- wordcloud_trans(mock, config = cfg)
   expect_s3_class(result, "data.frame")
   expect_true("word" %in% names(result))
   expect_true("n" %in% names(result))

@@ -1,16 +1,16 @@
 #' Compute Term Frequency and TF-IDF for Quran Translation
 #'
 #' @description
-#' Computes word or n-gram frequency, raw term frequency (TF), and 
-#' TF-IDF scores for a Quran translation. Grouping and preprocessing
-#' are controlled via a \code{QuranConfig} object.
+#' Computes word or n-gram frequency, raw term frequency (TF), and
+#' TF-IDF scores for a Quran translation. Grouping, selection, and
+#' preprocessing are fully controlled via a \code{TransAnalyticConfig} object,
+#' which acts as the complete analysis context.
 #'
 #' @param tanzil_trans_object A \code{translationList} object created with
 #'   \code{tanzil_translation()}.
-#' @param config A \code{QuranConfig} object created with \code{quran_config()}.
-#'   Defaults to \code{quran_config()} (English, unigram, by Surah, top 20).
-#' @param selection Integer vector of Surah/Juz/Ayah IDs to include.
-#'   \code{NULL} (default) means all.
+#' @param config A \code{TransAnalyticConfig} object created with
+#'   \code{trans_analytic_config()}. Defaults to \code{trans_analytic_config()}
+#'   (all surahs, English, unigram, top 20).
 #'
 #' @return A data frame with columns: group identifier, \code{word}, \code{n},
 #'   \code{total}, \code{tf}, \code{tf_idf}, sorted by descending \code{tf}.
@@ -21,45 +21,49 @@
 #' @export
 #'
 #' @examples
-#' # Default config - top 20 words by surah
 #' # data(trans_en_sahih, package = "XploreQuran")
+#'
+#' # Default: all surahs, top 20 English unigrams
 #' # tf_trans(trans_en_sahih)
 #'
-#' # Analyse Juz 30 using bigrams, remove stopwords
-#' # cfg <- quran_config(by = "juz", ngram = "bigram", top_n = 15)
-#' # tf_trans(trans_en_sahih, config = cfg, selection = 30)
+#' # Juz 30 only, bigrams
+#' # cfg <- trans_analytic_config(by = "juz", sub_by = 30, ngram = "bigram", top_n = 15)
+#' # tf_trans(trans_en_sahih, config = cfg)
+#'
+#' # Surahs 1 and 114 only
+#' # cfg2 <- trans_analytic_config(by = "surah", sub_by = c(1, 114))
+#' # tf_trans(trans_en_sahih, config = cfg2)
 tf_trans <- function(
     tanzil_trans_object,
-    config    = quran_config(),
-    selection = NULL
+    config = trans_analytic_config()
 ) {
   if (!"translationList" %in% class(tanzil_trans_object)) {
     stop("Input must be a translationList object created with tanzil_translation().")
   }
-  if (!"QuranConfig" %in% class(config)) {
-    stop("config must be a QuranConfig object. Create one with quran_config().")
+  if (!"TransAnalyticConfig" %in% class(config)) {
+    stop("config must be a TransAnalyticConfig object. Create one with trans_analytic_config().")
   }
-  
+
   # Resolve grouping column
   group_col <- switch(config$by,
     "surah" = "surah_id",
     "juz"   = "juz",
     "ayah"  = "ayah_id"
   )
-  
-  # Run preprocessing pipeline
-  tokens <- preprocess_tokens(tanzil_trans_object, config, selection)
-  
+
+  # Run preprocessing pipeline (sub_by filtering is handled inside)
+  tokens <- preprocess_tokens(tanzil_trans_object, config)
+
   # Count words per group
   count_words <- tokens %>%
     count(.data[[group_col]], word, sort = TRUE)
-  
+
   # Compute group totals
   total_words <- count_words %>%
     group_by(.data[[group_col]]) %>%
     summarize(total = sum(n), .groups = "drop")
-  
-  # Join, compute TF, and compute TF-IDF
+
+  # Join, compute TF and TF-IDF, apply top_n per group
   result <- count_words %>%
     left_join(total_words, by = group_col) %>%
     mutate(tf = n / total) %>%
@@ -68,6 +72,6 @@ tf_trans <- function(
     group_by(.data[[group_col]]) %>%
     slice_head(n = config$top_n) %>%
     ungroup()
-  
+
   return(result)
 }

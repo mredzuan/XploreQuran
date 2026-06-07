@@ -4,33 +4,37 @@
 \alias{tf_trans}
 \title{Compute Term Frequency and TF-IDF for Quran Translation}
 \usage{
-tf_trans(tanzil_trans_object, config = quran_config(), selection = NULL)
+tf_trans(tanzil_trans_object, config = trans_analytic_config())
 }
 \arguments{
 \item{tanzil_trans_object}{A \code{translationList} object created with
 \code{tanzil_translation()}.}
 
-\item{config}{A \code{QuranConfig} object created with \code{quran_config()}.
-Defaults to \code{quran_config()} (English, unigram, by Surah, top 20).}
-
-\item{selection}{Integer vector of Surah/Juz/Ayah IDs to include.
-\code{NULL} (default) means all.}
+\item{config}{A \code{TransAnalyticConfig} object created with
+\code{trans_analytic_config()}. Defaults to \code{trans_analytic_config()}
+(all surahs, English, unigram, top 20).}
 }
 \value{
 A data frame with columns: group identifier, \code{word}, \code{n},
   \code{total}, \code{tf}, \code{tf_idf}, sorted by descending \code{tf}.
 }
 \description{
-Computes word or n-gram frequency, raw term frequency (TF), and 
-TF-IDF scores for a Quran translation. Grouping and preprocessing
-are controlled via a \code{QuranConfig} object.
+Computes word or n-gram frequency, raw term frequency (TF), and
+TF-IDF scores for a Quran translation. Grouping, selection, and
+preprocessing are fully controlled via a \code{TransAnalyticConfig} object,
+which acts as the complete analysis context.
 }
 \examples{
-# Default config - top 20 words by surah
 # data(trans_en_sahih, package = "XploreQuran")
+
+# Default: all surahs, top 20 English unigrams
 # tf_trans(trans_en_sahih)
 
-# Analyse Juz 30 using bigrams, remove stopwords
-# cfg <- quran_config(by = "juz", ngram = "bigram", top_n = 15)
-# tf_trans(trans_en_sahih, config = cfg, selection = 30)
+# Juz 30 only, bigrams
+# cfg <- trans_analytic_config(by = "juz", sub_by = 30, ngram = "bigram", top_n = 15)
+# tf_trans(trans_en_sahih, config = cfg)
+
+# Surahs 1 and 114 only
+# cfg2 <- trans_analytic_config(by = "surah", sub_by = c(1, 114))
+# tf_trans(trans_en_sahih, config = cfg2)
 }

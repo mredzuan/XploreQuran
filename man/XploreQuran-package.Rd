@@ -17,7 +17,7 @@ design allowing consistent analysis across different functions via the
 
 \describe{
   \item{\code{\link{tanzil_translation}}}{Download a Quran translation from tanzil.net}
-  \item{\code{\link{quran_config}}}{Create a reusable analysis configuration object}
+  \item{\code{\link{trans_analytic_config}}}{Create a reusable analysis configuration object}
   \item{\code{\link{tf_trans}}}{Compute term frequency and TF-IDF}
   \item{\code{\link{wordcloud_trans}}}{Generate a word cloud}
   \item{\code{\link{run_app}}}{Launch the interactive Shiny web application}
