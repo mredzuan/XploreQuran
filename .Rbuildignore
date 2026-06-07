@@ -1,2 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.positai$
+^\.vscode$
+^app_requirement$
+^data-raw$
+^\.gitignore$
