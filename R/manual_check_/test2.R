@@ -11,32 +11,42 @@ trans_en_sahih <- trans_en_sahih
 
 
 # Create a Quran Analysis Configuration Object---------------
-cfg_surah <- quran_config(
-  by = "surah",
-  ngram = "unigram",
-  top_n = 20L,
-  remove_stopwords = TRUE,
-  stopword_lang = "en",
-  normalize = TRUE,
-  remove_special = TRUE,
-  remove_words = NULL
+
+cfg <- trans_analytic_config()
+cfg
+
+
+cfg_juz30 <- trans_analytic_config(by = "juz", sub_by = 30)
+
+cfg_multiple_juz <- trans_analytic_config(by = "juz", sub_by = c(28, 29, 30))
+
+
+cfg_ms <- trans_analytic_config(
+  by               = "surah",
+  sub_by           = c(1, 2, 36),
+  ngram            = "unigram",
+  top_n            = 10,
+  stopword_lang    = "ms",
+  normalize        = FALSE,
+  remove_word = c("aku")
 )
 
-cfg_juz <- quran_config(
-  by = "juz",
-  ngram = "unigram",
-  top_n = 20L,
-  remove_stopwords = TRUE,
-  stopword_lang = "en",
-  normalize = TRUE,
-  remove_special = TRUE,
-  remove_words = NULL
-)
-
-print(cfg)
 
 
-# Compute Term Frequency and TF-IDF for Quran Translation-------------
+# Test term frequency and TF-IDF-----------
 
-tf_surah <- tf_trans(trans_en_sahih, config = cfg_surah)
-tf_juz <- tf_trans(trans_en_sahih, config = cfg_juz)
+tf_trans(tanzil_trans_object = trans_en_sahih, config = cfg)
+tf_trans(trans_en_sahih, cfg_juz30)
+tf_trans(trans_en_sahih, trans_analytic_config(by = "juz", sub_by = 30, ngram = "bigram"))
+
+tf_multipleJuz <- tf_trans(trans_en_sahih, cfg_multiple_juz)
+tf_malay <- tf_trans(trans_ms_basmeih, cfg_ms)
+
+
+
+
+
+
+# Test WOrd cloud function-----------
+
+wordcloud_trans(trans_en_sahih, cfg)
