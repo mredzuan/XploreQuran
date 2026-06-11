@@ -154,35 +154,27 @@ input[type="number"].form-control:focus {
   box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2) !important;
 }
 
-/* Sidebar accordion — clean title, no uppercase */
-.sidebar .accordion-button {
+/* --- Text Pre-Processing Checkboxes ---------------------------------------- */
+.text-processing-checkboxes .checkbox {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.text-processing-checkboxes label {
+  display: flex;
+  align-items: center;
   font-size: 0.8rem;
-  font-weight: 600;
   color: #c9d1d9;
-  background-color: #1c2128;
-  border-radius: 0.4rem;
-  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  margin-bottom: 0;
 }
 
-.sidebar .accordion-button:not(.collapsed) {
-  color: #58a6ff;
-  background-color: #1c2128;
-  box-shadow: none;
-}
-
-.sidebar .accordion-button::after {
-  filter: invert(60%) sepia(10%) saturate(500%) hue-rotate(180deg);
-}
-
-.sidebar .accordion-item {
-  background-color: transparent;
-  border: 1px solid #30363d;
-  border-radius: 0.4rem !important;
-}
-
-.sidebar .accordion-body {
-  padding: 0.5rem 0.75rem;
-  background-color: #161b22;
+.text-processing-checkboxes input[type="checkbox"] {
+  margin-right: 0.6rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: #58a6ff;
+  cursor: pointer;
 }
 
 /* --- Plotly Charts --------------------------------------------------------- */
