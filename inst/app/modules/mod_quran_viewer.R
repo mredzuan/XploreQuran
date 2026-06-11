@@ -66,7 +66,15 @@ mod_quran_viewer_server <- function(id, all_translations) {
           size      = "xl",
           easyClose = TRUE,
           fade      = TRUE,
-          footer    = modalButton("Close"),
+          footer    = tagList(
+            tags$a(
+              href   = "?viewer=1",
+              target = "_blank",
+              class  = "btn btn-outline-secondary",
+              bsicons::bs_icon("box-arrow-up-right"), " Open in New Tab"
+            ),
+            modalButton("Close")
+          ),
 
           tags$script(HTML(
             "$(document).ready(function(){

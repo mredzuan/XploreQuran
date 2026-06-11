@@ -20,12 +20,16 @@ source("modules/mod_network.R")
 source("modules/mod_compare.R")
 source("modules/mod_quran_viewer.R")
 source("modules/mod_custom_import.R")
+source("modules/mod_quran_standalone.R")
 
 # ==============================================================================
-# UI
+# UI ROUTING
 # ==============================================================================
 
-ui <- page_navbar(
+# ---------------------------------------------------------------------------
+# Main App UI
+# ---------------------------------------------------------------------------
+ui_main <- page_navbar(
   title = tags$span(
     tags$img(src = "logo.png", height = "32px",
              style = "margin-right:10px; vertical-align:middle;"),
@@ -108,6 +112,30 @@ ui <- page_navbar(
   footer = mod_quran_viewer_ui("quran_viewer")
 )
 
+# ---------------------------------------------------------------------------
+# Router: Check query string to determine which UI to render
+# ---------------------------------------------------------------------------
+ui <- function(req) {
+  query <- shiny::parseQueryString(req$QUERY_STRING)
+  if (!is.null(query$viewer) && query$viewer == "1") {
+    # Provide the standalone UI for the viewer
+    # We populate the choices manually since it's initial load. 
+    # The server will handle updating if needed, but for standalone it's mostly static.
+    # To keep it simple, we use TRANSLATIONS list directly.
+    page_fluid(
+      theme = xplore_theme,
+      tags$head(
+        tags$link(rel = "stylesheet", href = "custom.css"),
+        tags$link(rel = "icon", type = "image/png", href = "logo.png"),
+        tags$title("Quran Viewer")
+      ),
+      mod_quran_standalone_ui("viewer_standalone", TRANSLATIONS, "trans_en_sahih")
+    )
+  } else {
+    ui_main
+  }
+}
+
 # ==============================================================================
 # SERVER
 # ==============================================================================
@@ -171,6 +199,9 @@ server <- function(input, output, session) {
 
   # Quran Viewer FAB modal (reads all_translations for picklist)
   mod_quran_viewer_server("quran_viewer", all_translations = all_translations)
+
+  # Standalone Quran Viewer (served on ?viewer=1)
+  mod_quran_standalone_server("viewer_standalone")
 
   # ---------------------------------------------------------------------------
   # Helper: resolve a translation key -> data frame
