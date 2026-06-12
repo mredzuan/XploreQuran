@@ -35,7 +35,7 @@ ui_main <- page_navbar(
              style = "margin-right:10px; vertical-align:middle;"),
     tags$span("Quran Translation Explorer", style = "vertical-align:middle;")
   ),
-  theme  = xplore_theme,
+  theme  = xplore_theme_light,
   id     = "main_navbar",
   lang   = "en",
 
@@ -43,7 +43,16 @@ ui_main <- page_navbar(
   header = tags$head(
     tags$link(rel = "stylesheet", href = "custom.css"),
     tags$link(rel = "icon", type = "image/png", href = "logo.png"),
-    tags$title("Quran Translation Explorer")
+    tags$title("Quran Translation Explorer"),
+    tags$script("
+      Shiny.addCustomMessageHandler('toggle_theme_class', function(message) {
+        if(message === 'Dark') {
+          document.body.classList.add('dark-mode');
+        } else {
+          document.body.classList.remove('dark-mode');
+        }
+      });
+    ")
   ),
 
   # Sidebar
@@ -98,13 +107,23 @@ ui_main <- page_navbar(
     mod_compare_ui("compare")
   ),
 
-  # Right-side version label
+  # Right-side version label and theme toggle
   nav_spacer(),
   nav_item(
-    tags$span(
-      class = "text-muted small",
-      style = "line-height:2.5rem;",
-      paste0("v", packageVersion("XploreQuran"))
+    div(
+      class = "d-flex align-items-center h-100",
+      style = "gap: 1rem; margin-top: 5px;",
+      radioButtons(
+        "theme_toggle",
+        label = NULL,
+        choices = c("Light", "Dark"),
+        selected = "Light",
+        inline = TRUE
+      ),
+      tags$span(
+        class = "text-muted small",
+        paste0("v", packageVersion("XploreQuran"))
+      )
     )
   ),
 
@@ -123,7 +142,7 @@ ui <- function(req) {
     # The server will handle updating if needed, but for standalone it's mostly static.
     # To keep it simple, we use TRANSLATIONS list directly.
     page_fluid(
-      theme = xplore_theme,
+      theme = xplore_theme_light,
       tags$head(
         tags$link(rel = "stylesheet", href = "custom.css"),
         tags$link(rel = "icon", type = "image/png", href = "logo.png"),
@@ -141,6 +160,19 @@ ui <- function(req) {
 # ==============================================================================
 
 server <- function(input, output, session) {
+
+  # ---------------------------------------------------------------------------
+  # Theme toggle logic
+  # ---------------------------------------------------------------------------
+  observeEvent(input$theme_toggle, {
+    if (input$theme_toggle == "Dark") {
+      session$setCurrentTheme(xplore_theme_dark)
+      session$sendCustomMessage("toggle_theme_class", "Dark")
+    } else {
+      session$setCurrentTheme(xplore_theme_light)
+      session$sendCustomMessage("toggle_theme_class", "Light")
+    }
+  }, ignoreInit = TRUE)
 
   # ---------------------------------------------------------------------------
   # Shared custom translations store
