@@ -186,11 +186,6 @@ mod_quran_standalone_server <- function(id) {
           # Two-column body
           div(
             class = "quran-ayah-row",
-            # Arabic column
-            div(
-              class = "quran-arabic-cell",
-              arabic
-            ),
             # Translation column
             div(
               class = "quran-trans-cell",
@@ -201,6 +196,11 @@ mod_quran_standalone_server <- function(id) {
                 else
                   translation
               )
+            ),
+            # Arabic column
+            div(
+              class = "quran-arabic-cell",
+              arabic
             )
           )
         )

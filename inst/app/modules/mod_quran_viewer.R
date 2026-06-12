@@ -62,19 +62,33 @@ mod_quran_viewer_server <- function(id, all_translations) {
 
       showModal(
         modalDialog(
-          title     = tagList(bsicons::bs_icon("book-half"), " Quran Viewer"),
+          title     = div(
+            style = "display: flex; align-items: center; width: 100%;",
+            div(
+              style = "display: flex; align-items: center; gap: 0.5rem;",
+              bsicons::bs_icon("book-half"), " Quran Viewer"
+            ),
+            div(
+              style = "display: flex; gap: 0.5rem; margin-left: auto; margin-right: 1.5rem;",
+              tags$a(
+                href   = "?viewer=1",
+                target = "_blank",
+                class  = "btn btn-outline-secondary btn-sm",
+                bsicons::bs_icon("box-arrow-up-right"), " Open in New Tab"
+              ),
+              tags$button(
+                type  = "button",
+                class = "btn btn-outline-secondary btn-sm",
+                `data-bs-dismiss` = "modal",
+                `data-dismiss`    = "modal",
+                "Close"
+              )
+            )
+          ),
           size      = "xl",
           easyClose = TRUE,
           fade      = TRUE,
-          footer    = tagList(
-            tags$a(
-              href   = "?viewer=1",
-              target = "_blank",
-              class  = "btn btn-outline-secondary",
-              bsicons::bs_icon("box-arrow-up-right"), " Open in New Tab"
-            ),
-            modalButton("Close")
-          ),
+          footer    = NULL,
 
           tags$script(HTML(
             "$(document).ready(function(){
@@ -249,11 +263,6 @@ mod_quran_viewer_server <- function(id, all_translations) {
           # Two-column body
           div(
             class = "quran-ayah-row",
-            # Arabic column
-            div(
-              class = "quran-arabic-cell",
-              arabic
-            ),
             # Translation column
             div(
               class = "quran-trans-cell",
@@ -264,6 +273,11 @@ mod_quran_viewer_server <- function(id, all_translations) {
                 else
                   translation
               )
+            ),
+            # Arabic column
+            div(
+              class = "quran-arabic-cell",
+              arabic
             )
           )
         )

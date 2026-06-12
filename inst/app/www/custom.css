@@ -329,6 +329,10 @@ input[type="number"].form-control:focus {
   font-weight: 700;
   font-size: 1.1rem;
   letter-spacing: 0.01em;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .quran-viewer-modal .modal-body {
@@ -349,6 +353,10 @@ input[type="number"].form-control:focus {
   border-radius: 0.6rem;
   padding: 0.85rem 1rem;
   margin-bottom: 1.25rem;
+}
+
+.quran-filter-bar .shiny-input-container {
+  margin-bottom: 0 !important;
 }
 
 .quran-filter-field {
@@ -412,8 +420,7 @@ input[type="number"].form-control:focus {
   text-align: right;
   direction: rtl;
   color: #f0a500;
-  padding-right: 0.5rem;
-  border-right: 2px solid #30363d;
+  padding-left: 0.5rem;
 }
 
 /* Translation column */
@@ -421,7 +428,8 @@ input[type="number"].form-control:focus {
   font-size: 0.88rem;
   line-height: 1.75;
   color: #c9d1d9;
-  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-right: 2px solid #30363d;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -460,7 +468,14 @@ input[type="number"].form-control:focus {
   }
   .quran-arabic-cell {
     border-right: none;
+    border-bottom: none;
+    padding-left: 0;
+    padding-top: 0.5rem;
+  }
+  .quran-trans-cell {
+    border-right: none;
     border-bottom: 1px solid #30363d;
+    padding-right: 0;
     padding-bottom: 0.5rem;
   }
   .quran-filter-bar {
