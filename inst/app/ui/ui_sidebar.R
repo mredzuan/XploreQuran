@@ -75,7 +75,7 @@ ui_sidebar <- function() {
         label    = NULL,
         choices  = c("All Surahs" = "All", SURAH_CHOICES),
         multiple = TRUE,
-        selected = "All",
+        selected = "1",
         width    = "100%"
       )
     ),
