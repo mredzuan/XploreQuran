@@ -35,15 +35,54 @@ ui_main <- page_navbar(
              style = "margin-right:10px; vertical-align:middle;"),
     tags$span("Quran Translation Explorer", style = "vertical-align:middle;")
   ),
-  theme  = xplore_theme,
+  theme  = xplore_theme_light,
   id     = "main_navbar",
   lang   = "en",
 
-  # Page-level head tags
-  header = tags$head(
-    tags$link(rel = "stylesheet", href = "custom.css"),
-    tags$link(rel = "icon", type = "image/png", href = "logo.png"),
-    tags$title("Quran Translation Explorer")
+  # Page-level head tags and Floating theme toggle
+  header = tagList(
+    tags$head(
+      tags$link(rel = "stylesheet", href = "custom.css"),
+      tags$link(rel = "icon", type = "image/png", href = "logo.png"),
+      tags$title("Quran Translation Explorer"),
+      tags$script("
+        Shiny.addCustomMessageHandler('toggle_theme_class', function(message) {
+          if(message === 'Dark') {
+            document.body.classList.add('dark-mode');
+          } else {
+            document.body.classList.remove('dark-mode');
+          }
+        });
+      ")
+    ),
+    tags$div(
+      class = "theme-toggle-container",
+      tags$span(
+        class = "theme-toggle-version",
+        paste0("v", packageVersion("XploreQuran"))
+      ),
+      tags$div(
+        class = "theme-toggle-wrapper",
+        tags$input(
+          type = "checkbox",
+          id = "theme_toggle",
+          class = "theme-toggle-input"
+        ),
+        tags$label(
+          `for` = "theme_toggle",
+          class = "theme-toggle-label",
+          tags$span(
+            class = "theme-toggle-icon light-icon",
+            bsicons::bs_icon("sun-fill")
+          ),
+          tags$span(
+            class = "theme-toggle-icon dark-icon",
+            bsicons::bs_icon("moon-fill")
+          ),
+          tags$span(class = "theme-toggle-ball")
+        )
+      )
+    )
   ),
 
   # Sidebar
@@ -98,15 +137,31 @@ ui_main <- page_navbar(
     mod_compare_ui("compare")
   ),
 
-  # Right-side version label
-  nav_spacer(),
-  nav_item(
-    tags$span(
-      class = "text-muted small",
-      style = "line-height:2.5rem;",
-      paste0("v", packageVersion("XploreQuran"))
+  nav_panel(
+    title = tagList(bsicons::bs_icon("info-circle"), " About"),
+    value = "tab_about",
+    card(
+      card_header(bsicons::bs_icon("info-circle"), " About XploreQuran"),
+      card_body(
+        p("Welcome to ", strong("XploreQuran"), " — an interactive text mining
+          and analytics platform for Quran translations."),
+        p("Use the sidebar to select a translation, choose a Surah range,
+          configure preprocessing options, and click ", strong("Run Analysis"),
+          " to explore the results across all tabs."),
+        tags$ul(
+          tags$li(strong("Word Analysis:"), " Word frequency, TF-IDF rankings."),
+          tags$li(strong("Sentiment:"), " Positive/negative/neutral tone by section."),
+          tags$li(strong("Wordcloud:"), " Visual frequency map of key terms."),
+          tags$li(strong("N-grams:"), " Bigrams, trigrams and word correlations."),
+          tags$li(strong("Topic Model:"), " Latent Dirichlet Allocation (LDA) topics."),
+          tags$li(strong("Network:"), " Word co-occurrence graph."),
+          tags$li(strong("Compare:"), " Side-by-side translation comparison.")
+        )
+      )
     )
   ),
+
+  # Right-side version label and theme toggle removed (now floating in header)
 
   # Floating Quran Viewer FAB (page footer — always visible)
   footer = mod_quran_viewer_ui("quran_viewer")
@@ -123,7 +178,7 @@ ui <- function(req) {
     # The server will handle updating if needed, but for standalone it's mostly static.
     # To keep it simple, we use TRANSLATIONS list directly.
     page_fluid(
-      theme = xplore_theme,
+      theme = xplore_theme_light,
       tags$head(
         tags$link(rel = "stylesheet", href = "custom.css"),
         tags$link(rel = "icon", type = "image/png", href = "logo.png"),
@@ -141,6 +196,19 @@ ui <- function(req) {
 # ==============================================================================
 
 server <- function(input, output, session) {
+
+  # ---------------------------------------------------------------------------
+  # Theme toggle logic (custom sliding checkbox widget)
+  # ---------------------------------------------------------------------------
+  observeEvent(input$theme_toggle, {
+    if (isTRUE(input$theme_toggle)) {
+      session$setCurrentTheme(xplore_theme_dark)
+      session$sendCustomMessage("toggle_theme_class", "Dark")
+    } else {
+      session$setCurrentTheme(xplore_theme_light)
+      session$sendCustomMessage("toggle_theme_class", "Light")
+    }
+  }, ignoreInit = TRUE)
 
   # ---------------------------------------------------------------------------
   # Shared custom translations store
@@ -239,13 +307,14 @@ server <- function(input, output, session) {
     withProgress(message = "Loading translation data\u2026", value = 0.3, {
       df <- resolve_translation_df(input$sel_translation)
 
-      sub_by <- if (input$sel_by == "surah") {
-        as.integer(input$sel_surah)
+      # Handle "All" selection (or empty select) to display all surahs
+      sub_by <- if ("All" %in% input$sel_surah || is.null(input$sel_surah) || length(input$sel_surah) == 0) {
+        NULL
       } else {
-        as.integer(input$sel_juz)
+        as.integer(input$sel_surah)
       }
 
-      df <- filter_quran(df, by = input$sel_by, sub_by = sub_by)
+      df <- filter_quran(df, by = "surah", sub_by = sub_by)
       incProgress(1)
       df
     })
@@ -253,6 +322,18 @@ server <- function(input, output, session) {
   ignoreNULL = FALSE,
   ignoreInit = FALSE
   )
+
+  # Parse custom removed words (comma-separated input)
+  remove_words_vec <- reactive({
+    if (is.null(input$txt_remove_words) || input$txt_remove_words == "") {
+      return(NULL)
+    }
+    words <- strsplit(input$txt_remove_words, ",")[[1]]
+    words <- trimws(words)
+    words <- words[words != ""]
+    if (length(words) == 0) return(NULL)
+    words
+  })
 
   # ---------------------------------------------------------------------------
   # Reactive: Tokenised words (shared across all analysis modules)
@@ -263,7 +344,8 @@ server <- function(input, output, session) {
       df           = quran_df(),
       remove_sw    = isTRUE(input$chk_stopwords),
       sw_lang      = active_lang(),
-      remove_words = NULL
+      remove_words = remove_words_vec(),
+      normalize    = isTRUE(input$chk_normalize)
     )
   })
 
@@ -278,7 +360,7 @@ server <- function(input, output, session) {
   # Analysis Module Server Calls
   # (placed after all reactives are defined)
   # ---------------------------------------------------------------------------
-  mod_overview_server("overview",           quran_df  = quran_df, tokens_df = tokens_df)
+  mod_overview_server("overview",           quran_df  = quran_df, tokens_df = tokens_df, top_n = top_n, is_dark = reactive({ isTRUE(input$theme_toggle) }))
   mod_word_analysis_server("word_analysis", tokens_df = tokens_df, top_n = top_n)
   mod_sentiment_server("sentiment",         tokens_df = tokens_df)
   mod_wordcloud_server("wordcloud",         tokens_df = tokens_df)

@@ -35,7 +35,7 @@ cfg_ms <- trans_analytic_config(
 
 # Test term frequency and TF-IDF-----------
 
-tf_trans(tanzil_trans_object = trans_en_sahih, config = cfg)
+term_freq_shahih <- tf_trans(tanzil_trans_object = trans_en_sahih, config = cfg)
 tf_trans(trans_en_sahih, cfg_juz30)
 tf_trans(trans_en_sahih, trans_analytic_config(by = "juz", sub_by = 30, ngram = "bigram"))
 
