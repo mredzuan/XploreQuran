@@ -59,7 +59,7 @@ mod_wordcloud_server <- function(id, tokens_df) {
              "No words meet the minimum frequency threshold. Try lowering Min Frequency.")
       )
 
-      par(bg = "#161b22")
+      par(mar = c(0, 0, 0, 0), bg = NA)
       wordcloud::wordcloud(
         words        = df$word,
         freq         = df$n,
@@ -69,7 +69,7 @@ mod_wordcloud_server <- function(id, tokens_df) {
         colors       = RColorBrewer::brewer.pal(8, input$palette),
         scale        = c(4, 0.5)
       )
-    }, bg = "#161b22")
+    }, bg = "transparent")
 
     # Download as PNG using recordPlot
     output$dl_wordcloud <- downloadHandler(
@@ -78,7 +78,7 @@ mod_wordcloud_server <- function(id, tokens_df) {
         req(wc_data())
         df <- wc_data()
         png(file, width = 1200, height = 900, bg = "#161b22")
-        par(bg = "#161b22")
+        par(mar = c(0, 0, 0, 0), bg = "#161b22")
         wordcloud::wordcloud(
           words        = df$word,
           freq         = df$n,

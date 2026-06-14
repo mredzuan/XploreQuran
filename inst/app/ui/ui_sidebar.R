@@ -5,15 +5,13 @@
 # Layout hierarchy:
 #   Translation Analytic Configuration  (panel title, no icon)
 #   ├─ Select Translation               [dropdown] [⬇ import]
-#   ├─ Analyse by:
-#   │   ├─ [Surah] [Juz]  radio
-#   │   └─ Select Surah(s) / Select Juz  (conditional picklist)
-#   ├─ Select Number for Top Term       [numericInput]
-#   ├─ Text Pre-Processing              (collapsible accordion)
-#   │   ├─ Remove Stop Words
-#   │   ├─ Stem Words
-#   │   └─ Remove Punctuation
-#   └─ [Run Analysis]
+#   ├─ Select Surah(s)                  [dropdown multiple]
+#   ├─ Text Pre-Processing              [themed group]
+#   │   ├─ Remove Stop Words            [checkbox]
+#   │   ├─ Stem Words                   [checkbox]
+#   │   └─ Remove Punctuation           [checkbox]
+#   ├─ Top Terms Limit                  [numericInput] [info-circle tooltip]
+#   └─ [Run Analysis]                   [actionButton]
 # ==============================================================================
 
 ui_sidebar <- function() {
@@ -23,10 +21,10 @@ ui_sidebar <- function() {
 
     # ── Panel Title ────────────────────────────────────────────────────────────
     div(
-      class = "mb-4 text-center",
+      class = "mb-2 text-center",
       tags$p(
         class = "fw-bold mb-0",
-        style = "font-size:0.95rem; letter-spacing:0.02em; color:#58a6ff;",
+        style = "font-size:0.95rem; letter-spacing:0.02em; color: var(--cq-primary);",
         "Analytic Configuration"
       ),
       tags$p(
@@ -38,12 +36,12 @@ ui_sidebar <- function() {
 
     # ── Select Translation ─────────────────────────────────────────────────────
     div(
-      class = "mb-4",
+      class = "mb-2",
       div(
         style = "display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;",
         tags$label(
           class = "form-label fw-semibold mb-0",
-          style = "font-size:0.8rem; color:#c9d1d9;",
+          style = "font-size:0.8rem; color: var(--cq-fg);",
           "Translation"
         ),
         actionButton(
@@ -63,61 +61,76 @@ ui_sidebar <- function() {
       )
     ),
 
-    # ── Analyse by: ────────────────────────────────────────────────────────────
+    # ── Select Surah(s) ────────────────────────────────────────────────────────
     div(
-      class = "mb-4",
+      class = "mb-2",
       tags$label(
-        class = "form-label fw-semibold mb-2",
-        style = "font-size:0.8rem; color:#c9d1d9;",
-        "Grouping Level"
+        `for`  = "sel_surah",
+        class  = "form-label fw-semibold mb-1",
+        style  = "font-size:0.8rem; color: var(--cq-fg);",
+        "Select Surah(s)"
       ),
-      
-      div(
-        class = "mb-2",
-        radioButtons(
-          inputId  = "sel_by",
-          label    = NULL,
-          choices  = c("Surah" = "surah", "Juz" = "juz"),
-          selected = "surah",
-          inline   = TRUE
-        )
-      ),
-
-      # Conditional: Select Surah(s)
-      conditionalPanel(
-        condition = "input.sel_by == 'surah'",
-        selectInput(
-          inputId  = "sel_surah",
-          label    = tags$span(style="font-size:0.75rem; color:#8b949e;", "Select Surah(s)"),
-          choices  = SURAH_CHOICES,
-          multiple = TRUE,
-          selected = NULL,
-          width    = "100%"
-        )
-      ),
-
-      # Conditional: Select Juz
-      conditionalPanel(
-        condition = "input.sel_by == 'juz'",
-        selectInput(
-          inputId  = "sel_juz",
-          label    = tags$span(style="font-size:0.75rem; color:#8b949e;", "Select Juz"),
-          choices  = setNames(JUZ_CHOICES, paste("Juz", JUZ_CHOICES)),
-          multiple = TRUE,
-          selected = NULL,
-          width    = "100%"
-        )
+      selectInput(
+        inputId  = "sel_surah",
+        label    = NULL,
+        choices  = c("All Surahs" = "All", SURAH_CHOICES),
+        multiple = TRUE,
+        selected = "All",
+        width    = "100%"
       )
     ),
 
-    # ── Select Number for Top Term ─────────────────────────────────────────────
+    # ── Text Pre-Processing ────────────────────────────────────────────────────
     div(
-      class = "mb-4",
+      class = "mb-2 p-3",
+      style = "background-color: var(--cq-card-bg); border: 1px solid var(--cq-card-border); border-radius: 0.5rem;",
       tags$label(
-        `for`  = "n_top_n",
+        class = "form-label fw-semibold mb-2",
+        style = "font-size:0.8rem; color: var(--cq-fg); display:block; border-bottom: 1px solid var(--cq-card-border); padding-bottom:0.4rem;",
+        "Text Pre-Processing"
+      ),
+      div(
+        class = "pt-1 text-processing-checkboxes",
+        checkboxInput("chk_stopwords", "Remove Stop Words",  value = TRUE),
+        checkboxInput("chk_normalize", "Stem Words",         value = TRUE),
+        checkboxInput("chk_special",   "Remove Punctuation", value = TRUE)
+      )
+    ),
+
+    # ── Remove Word(s) ─────────────────────────────────────────────────────────
+    div(
+      class = "mb-2",
+      tags$label(
+        `for`  = "txt_remove_words",
         class  = "form-label fw-semibold mb-1",
-        style  = "font-size:0.8rem; color:#c9d1d9;",
-        "Top Terms Limit"
+        style  = "font-size:0.8rem; color: var(--cq-fg);",
+        "Remove Custom Words"
+      ),
+      textInput(
+        inputId     = "txt_remove_words",
+        label       = NULL,
+        value       = "",
+        placeholder = "e.g. word1, word2 (comma separated)",
+        width       = "100%"
+      )
+    ),
+
+    # ── Select Number for Top Term (Top Terms Limit) ───────────────────────────
+    div(
+      class = "mb-2",
+      div(
+        style = "display:flex; align-items:center; gap:0.3rem; margin-bottom:0.3rem;",
+        tags$label(
+          `for`  = "n_top_n",
+          class  = "form-label fw-semibold mb-0",
+          style  = "font-size:0.8rem; color: var(--cq-fg);",
+          "Top Terms Limit"
+        ),
+        bslib::tooltip(
+          bsicons::bs_icon("info-circle", class = "text-muted", style = "font-size:0.8rem; cursor:pointer;"),
+          "Controls the maximum number of most frequent words to display in analysis charts and word clouds.",
+          placement = "right"
+        )
       ),
       numericInput(
         inputId = "n_top_n",
@@ -130,26 +143,9 @@ ui_sidebar <- function() {
       )
     ),
 
-    # ── Text Pre-Processing ────────────────────────────────────────────────────
-    div(
-      class = "mb-4 p-3",
-      style = "background-color: #1c2128; border: 1px solid #30363d; border-radius: 0.5rem;",
-      tags$label(
-        class = "form-label fw-semibold mb-2",
-        style = "font-size:0.8rem; color:#c9d1d9; display:block; border-bottom: 1px solid #30363d; padding-bottom:0.4rem;",
-        "Text Pre-Processing"
-      ),
-      div(
-        class = "pt-1 text-processing-checkboxes",
-        checkboxInput("chk_stopwords", "Remove Stop Words",  value = TRUE),
-        checkboxInput("chk_normalize", "Stem Words",         value = FALSE),
-        checkboxInput("chk_special",   "Remove Punctuation", value = TRUE)
-      )
-    ),
-
     # ── Run Analysis ───────────────────────────────────────────────────────────
     div(
-      class = "d-grid mt-4",
+      class = "d-grid mt-3",
       actionButton(
         inputId = "btn_apply",
         label   = tagList(bsicons::bs_icon("play-fill"), " Run Analysis"),

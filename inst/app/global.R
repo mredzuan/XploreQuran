@@ -84,7 +84,8 @@ filter_quran <- function(df, by = "surah", sub_by = NULL) {
 tokenise_translation <- function(df,
                                  remove_sw    = TRUE,
                                  sw_lang      = "en",
-                                 remove_words = NULL) {
+                                 remove_words = NULL,
+                                 normalize    = FALSE) {
 
   text_col <- if ("translation" %in% names(df)) "translation" else "text"
 
@@ -102,6 +103,18 @@ tokenise_translation <- function(df,
 
   if (!is.null(remove_words) && length(remove_words) > 0) {
     tokens <- dplyr::filter(tokens, !word %in% tolower(remove_words))
+  }
+
+  if (normalize) {
+    lang_map <- c(
+      "en" = "english", "fr" = "french", "es" = "spanish",
+      "pt" = "portuguese", "ru" = "russian", "de" = "german",
+      "nl" = "dutch", "tr" = "turkish", "ar" = "arabic"
+    )
+    stem_lang <- if (sw_lang %in% names(lang_map)) lang_map[[sw_lang]] else sw_lang
+    if (stem_lang %in% SnowballC::getStemLanguages()) {
+      tokens <- dplyr::mutate(tokens, word = SnowballC::wordStem(word, language = stem_lang))
+    }
   }
 
   tokens
