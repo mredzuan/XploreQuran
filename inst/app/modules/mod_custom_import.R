@@ -49,27 +49,27 @@ mod_custom_import_server <- function(id, custom_trans_rv, open_trigger) {
 
           # Instructions
           tags$p(
-            class = "text-muted small mb-3",
+            class = "text-body-secondary small mb-3",
             "Enter up to 4 translation URLs from ",
             tags$a("tanzil.net/trans", href = "https://tanzil.net/trans/",
-                   target = "_blank", style = "color:#58a6ff;"),
+                   target = "_blank", style = "color:var(--bs-link-color, #58a6ff);"),
             " and provide a display name for each."
           ),
 
           # 4 URL + Name input rows
           purrr::map(1:4, function(i) {
             div(
-              class = "mb-3 p-2",
-              style = "background:#1c2128; border-radius:0.5rem; border:1px solid #30363d;",
+              class = "mb-3 p-3",
+              style = "background-color: var(--bs-tertiary-bg, #f8f9fa); border-radius: 0.5rem; border: 1px solid var(--bs-border-color, #dee2e6);",
 
               tags$label(
-                class = "form-label text-muted small fw-bold mb-2",
-                paste0(bsicons::bs_icon("link-45deg"), " Custom Translation #", i)
+                class = "form-label text-body small fw-bold mb-2",
+                bsicons::bs_icon("link-45deg"), paste0(" Custom Translation #", i)
               ),
 
               div(
-                class = "mb-1",
-                tags$small(class = "text-muted", "Tanzil URL"),
+                class = "mb-2",
+                tags$small(class = "text-body-secondary fw-semibold", "Tanzil URL"),
                 textInput(
                   inputId     = ns(paste0("url_", i)),
                   label       = NULL,
@@ -79,7 +79,7 @@ mod_custom_import_server <- function(id, custom_trans_rv, open_trigger) {
               ),
 
               div(
-                tags$small(class = "text-muted", "Display Name"),
+                tags$small(class = "text-body-secondary fw-semibold", "Display Name"),
                 textInput(
                   inputId     = ns(paste0("name_", i)),
                   label       = NULL,
